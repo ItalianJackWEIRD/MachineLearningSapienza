@@ -1,0 +1,52 @@
+Concerning the graphic on the episode rewards, ideally we should exepct that during the firsts episodes we have less rewards=1 then the lasts.
+However in the frozen lake environment deterministic (is_slippery=False) also random actions can bring to the goal; so there is the possibility thatat the start we have lucky episodes.
+
+The value of the epsilon_decay=0.995 is too fast so the agent stop rapidly to explore, This
+might results in a situation where it takes wrong actions because he doesn't know best
+alternatives.
+
+If the alpha value (learning rate) is too high each new experience might 
+replace the precedent, if after a good action it takes a wrong action mmight appen that can delete the learned value.
+
+The epsilon_min value can be increased in order to give to the agent the possibility to explore more also when the epsilon is too low, so we wont encounter anymore 
+the problem of the Tabular Q-Learning graphic; 
+self.epsilon = max(self.epsilon * self.epsilon_decay, self.epsilon_min):
+infact when self.epsilon is too low and max() takes the higher value not will take self.epsilon_min=0.0 instead of 0.1. This results in:
+    def choose_action(self, state):
+        if np.random.rand() < self.epsilon:
+            return np.random.choice(self.action_size)
+        return np.argmax(self.q_table[state])
+🔍 Why a bad path might have a high Q-value:
+✅ 1. Early random success
+At the beginning, actions are chosen randomly (due to high epsilon).
+
+If the agent accidentally reaches the goal via a bad path (long or suboptimal), the reward is still +1.
+
+That single success gets credited to the actions along that path, even if the path is not the best.
+
+👉 Those actions get their Q-values increased.
+
+🚫 2. No correction without exploration
+If the agent stops exploring early (epsilon ≈ 0), it never tries better paths.
+
+So it never discovers there's a shorter or more reliable route.
+
+The original, worse path stays "best" in the Q-table, even though it’s not optimal.
+
+🧠 3. Q-values are bootstrapped guesses
+The Q-value is computed as:
+
+//formula
+
+This means:
+
+It relies on future Q-values (max Q(s', a')), which might themselves be inaccurate at the time.
+
+So a bad state that leads to overestimated future rewards will have inflated Q-values.
+
+This is called the overestimation bias in Q-learning.
+
+📉 4. Sparse rewards (like FrozenLake) make this worse
+Since rewards are 0 everywhere except at the goal, most state-action pairs are updated with 0.
+
+Only the one lucky path gets reward +1, so it can dominate the Q-table unfairly.

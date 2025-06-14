@@ -1,0 +1,52 @@
+📈 1. Episode Rewards Over Time
+File: Tabular_Q-Learning_on_FrozenLake.png (from plot_rewards())
+
+🔍 What it shows:
+This plot displays the raw total reward obtained by the agent in each episode.
+
+In FrozenLake, reward is 1 if the goal is reached, otherwise 0.
+
+A flat line at 0 indicates the agent never reached the goal during those episodes.
+
+A rising trend shows learning progress — the agent begins to consistently reach the goal.
+
+🧠 How to interpret:
+Initially, rewards are low due to exploration.
+
+As the agent learns, it starts to reach the goal more often.
+
+Reward spikes correspond to successful episodes.
+
+📉 2. Smoothed Rewards Over Time
+File: Smoothed_Rewards_on_FrozenLake.png (from plot_smoothed_rewards())
+
+🔍 What it shows:
+This graph smooths the reward curve using exponential averaging to highlight trends and filter out noise.
+
+Shows a clearer learning trajectory than raw rewards.
+
+Useful when training is noisy or has high variance.
+
+🧠 How to interpret:
+Smoother rise in rewards confirms gradual learning.
+
+If it stays flat near 0, the agent isn't improving (e.g., bad hyperparameters or poor exploration).
+
+Rising curve = better long-term policy.
+
+📊 3. Rolling Success Rate
+File: Rolling_Success_Rate.png
+
+🔍 What it shows:
+A rolling average of success (goal reached) over the last 100 episodes.
+
+Each point is the mean of the last 100 episodes' success (1 or 0).
+
+Reflects the consistency of agent performance over time.
+
+🧠 How to interpret:
+A rise toward 1.0 means the agent is consistently reaching the goal.
+
+A flat line at 0.0 means no goal success.
+
+Ideal outcome: the curve rises and plateaus near 1.0 → agent has learned optimal behavior.
