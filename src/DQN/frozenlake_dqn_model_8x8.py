@@ -15,7 +15,7 @@ class DQN(tf.keras.Model):
         x = self.fc2(x)
         return self.out(x)
 
-# Replay memory with increased size (initialize with maxlen, no change here)
+# Replay memory with increased size (initialize with maxlen, no change here) --- Experience Replay Memory
 class ReplayMemory:
     def __init__(self, maxlen):
         self.memory = []

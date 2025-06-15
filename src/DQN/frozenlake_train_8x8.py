@@ -6,8 +6,16 @@ import tensorflow as tf
 import random
 from config8x8 import CONFIG
 
-ACTIONS = ['L', 'D', 'R', 'U']
+ACTIONS = ['L', 'D', 'R', 'U']  # for printing 0,1,2,3 -> 'Left', 'Down', 'Right', 'Up'
 
+
+'''
+Converts a state (int) to a tensor representation.
+For example, the FrozenLake 4x4 map has 4x4=16 states numbered from 0 to 15. 
+
+Parameters: state=1, num_states=16
+Return: tensor([0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.])
+'''
 def state_to_input(state, num_states):
     one_hot = np.zeros(num_states)
     one_hot[state] = 1
@@ -22,12 +30,12 @@ def train():
     hidden_layers = CONFIG.get('hidden_layer_sizes', [128, 64])
     
     # Instantiate DQN with *unpack hidden layers*
-    policy_dqn = DQN(num_states, *hidden_layers, num_actions)
-    target_dqn = DQN(num_states, *hidden_layers, num_actions)
+    policy_dqn = DQN(num_states, *hidden_layers, num_actions)       # STEP 1 : Create the policy network
+    target_dqn = DQN(num_states, *hidden_layers, num_actions)       # STEP 2 : Create the target network identical to the policy network
     target_dqn.set_weights(policy_dqn.get_weights())
 
-    optimizer = tf.keras.optimizers.Adam(learning_rate=CONFIG['learning_rate'])
-    loss_fn = tf.keras.losses.MeanSquaredError()
+    optimizer = tf.keras.optimizers.Adam(learning_rate=CONFIG['learning_rate'])     # NN optimizer
+    loss_fn = tf.keras.losses.MeanSquaredError()    # NN loss function 
 
     memory = ReplayMemory(CONFIG['memory_size'])
     mini_batch_size = CONFIG['mini_batch_size']
@@ -38,30 +46,32 @@ def train():
     epsilon_decay = CONFIG.get('epsilon_decay', 1 / CONFIG['episodes'])
     episodes = CONFIG['episodes']
 
-    rewards_per_episode = np.zeros(episodes)
-    epsilon_history = []
-    step_count = 0
+    rewards_per_episode = np.zeros(episodes)        # keep track of rewards per episode
+    epsilon_history = []    # keep track of epsilon decay
+    step_count = 0      # step count for syncing policy -> target network
 
     for i in range(episodes):
         state = env.reset()[0]
         done = False
 
         while not done:
-            if random.random() < epsilon:
+            if random.random() < epsilon:   # STEP 3 : Epsilon-greedy algorithm    
                 action = env.action_space.sample()
             else:
                 q_values = policy_dqn(state_to_input(state, num_states))
                 action = tf.argmax(q_values[0]).numpy()
 
-            new_state, reward, terminated, truncated, _ = env.step(action)
+            new_state, reward, terminated, truncated, _ = env.step(action)  # Take action in the environment
+
             done = terminated or truncated
-            memory.append((state, action, new_state, reward, done))
-            state = new_state
+            memory.append((state, action, new_state, reward, done)) # Store transition in memory
+            state = new_state   # Update state for next step
             step_count += 1
 
         if reward == 1:
             rewards_per_episode[i] = 1
 
+        # Check memory to see if we have enough traning data and if the episode was successful
         if len(memory) >= mini_batch_size and np.sum(rewards_per_episode) > 0:
             mini_batch = memory.sample(mini_batch_size)
             states, actions, new_states, rewards, dones = zip(*mini_batch)
@@ -84,6 +94,7 @@ def train():
             epsilon = max(epsilon - epsilon_decay, epsilon_min)
             epsilon_history.append(epsilon)
 
+            # STEP 10 : Sync target network with policy network weights after a certain number of steps   
             if step_count > sync_rate:
                 target_dqn.set_weights(policy_dqn.get_weights())
                 step_count = 0
