@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import os
 from q_learning import QLearningAgent
 from utils import plot_rewards, plot_smoothed_rewards
 from config_q_4x4 import CONFIG
@@ -37,8 +38,9 @@ for ep in range(episodes):
     rewards.append(total_reward)
     epsilons.append(agent.epsilon)
 
-plot_rewards(rewards, title='Tabular Q-Learning on FrozenLake 4x4')
-plot_smoothed_rewards(rewards, title='Smoothed Rewards on FrozenLake 4x4')
+current_dir = os.path.dirname(__file__)
+plot_rewards(rewards, title='Tabular Q-Learning on FrozenLake 4x4', save_dir=current_dir)
+plot_smoothed_rewards(rewards, title='Smoothed Rewards on FrozenLake 4x4', save_dir=current_dir)
 
 successes = [int(r > 0) for r in rewards]
 rolling_success = pd.Series(successes).rolling(window=100).mean()
@@ -48,7 +50,7 @@ plt.title("Rolling Success Rate (window=100)")
 plt.xlabel("Episode")
 plt.ylabel("Success Rate")
 plt.tight_layout()
-plt.savefig("Rolling_Success_Rate_4x4.png")
+plt.savefig(os.path.join(current_dir,"Rolling_Success_Rate_4x4.png"))
 plt.close()
 
 plt.figure()
@@ -57,7 +59,7 @@ plt.title("Epsilon Decay Over Episodes")
 plt.xlabel("Episode")
 plt.ylabel("Epsilon (Exploration Rate)")
 plt.tight_layout()
-plt.savefig("Epsilon_Decay_4x4.png")
+plt.savefig(os.path.join(current_dir,"Epsilon_Decay_4x4.png"))
 plt.close()
 
-np.save("q_table_4x4.npy", agent.q_table)
+np.save(os.path.join(current_dir,"q_table_4x4.npy"), agent.q_table)
