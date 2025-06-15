@@ -4,20 +4,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from q_learning import QLearningAgent
+from config_q_8x8 import CONFIG
 
-# Load trained Q-table
-q_table = np.load("q_table.npy")
+q_table = np.load("q_table_8x8.npy")
 
-# Create environment (now with is_slippery=True for robustness test)
-env = gym.make("FrozenLake-v1", is_slippery=True, render_mode="human")
+env = gym.make(CONFIG['env_name'], map_name=CONFIG['map_name'], is_slippery=True)
 state_size = env.observation_space.n
 action_size = env.action_space.n
 
-# Create agent with greedy policy (no exploration)
-agent = QLearningAgent(state_size, action_size, epsilon=0.0)
+agent = QLearningAgent(state_size, action_size,
+                       alpha=CONFIG['alpha'], gamma=CONFIG['gamma'],
+                       epsilon=0.0, epsilon_decay=1.0, epsilon_min=0.0)
 agent.q_table = q_table
 
-n_episodes = 10
+n_episodes = CONFIG['test_episodes']
 successes = 0
 rewards = []
 actions_per_episode = []
@@ -40,34 +40,30 @@ for ep in range(n_episodes):
     if total_reward > 0:
         successes += 1
 
-# Print summary
 print(f"\nTest results over {n_episodes} episodes:")
 print(f"Success rate: {successes / n_episodes:.2%}")
 print(f"Average reward: {np.mean(rewards):.3f}")
 
-# Save results to text file
-with open("test_results.txt", "w") as f:
+with open("test_results_8x8.txt", "w") as f:
     f.write(f"Success rate: {successes / n_episodes:.2%}\n")
     f.write(f"Average reward: {np.mean(rewards):.3f}\n")
 
-# --- Plot reward distribution ---
 plt.figure()
 sns.histplot(rewards, bins=[0, 0.5, 1], discrete=True)
-plt.title("Test Reward Distribution")
+plt.title("Test Reward Distribution (8x8)")
 plt.xlabel("Reward")
 plt.ylabel("Frequency")
 plt.xticks([0, 1])
 plt.tight_layout()
-plt.savefig("Test_Reward_Distribution.png")
+plt.savefig("Test_Reward_Distribution_8x8.png")
 plt.close()
 
-# --- Plot policy histogram (best actions by state) ---
 best_actions = np.argmax(agent.q_table, axis=1)
 plt.figure()
 plt.bar(range(len(best_actions)), best_actions)
-plt.title("Best Action per State from Trained Policy")
+plt.title("Best Action per State (8x8)")
 plt.xlabel("State")
 plt.ylabel("Best Action")
 plt.tight_layout()
-plt.savefig("Test_Best_Action_Per_State.png")
+plt.savefig("Test_Best_Action_Per_State_8x8.png")
 plt.close()
