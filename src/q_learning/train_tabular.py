@@ -20,7 +20,7 @@ for ep in range(episodes):
 
     while not done:
         action = agent.choose_action(state)
-        next_state, reward, done, truncated, _ = env.step(action)
+        next_state, reward, done, truncated, _ = env.step(action)   # Note: "done" = "terminated" -> hole or goal
         agent.update(state, action, reward, next_state, done)
         state = next_state
         total_reward += reward

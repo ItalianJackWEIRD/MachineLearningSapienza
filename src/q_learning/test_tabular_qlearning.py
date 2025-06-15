@@ -9,7 +9,7 @@ from q_learning import QLearningAgent
 q_table = np.load("q_table.npy")
 
 # Create environment (now with is_slippery=True for robustness test)
-env = gym.make("FrozenLake-v1", is_slippery=True)
+env = gym.make("FrozenLake-v1", is_slippery=True, render_mode="human")
 state_size = env.observation_space.n
 action_size = env.action_space.n
 
@@ -17,7 +17,7 @@ action_size = env.action_space.n
 agent = QLearningAgent(state_size, action_size, epsilon=0.0)
 agent.q_table = q_table
 
-n_episodes = 100
+n_episodes = 10
 successes = 0
 rewards = []
 actions_per_episode = []
