@@ -2,20 +2,23 @@ import gymnasium as gym
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import os
 from dqn_model import DQN
 
 class FrozenLakeTester:
     def __init__(self):
         self.actions = ['L', 'D', 'R', 'U']
 
-    def test(self, episodes=10, is_slippery=False):
+    def test(self, episodes=100, is_slippery=False):
         env = gym.make('FrozenLake-v1', map_name='4x4', is_slippery=is_slippery, render_mode='human')
         num_states = env.observation_space.n
         num_actions = env.action_space.n
 
+        current_dir = os.path.dirname(__file__)
+
         policy_net = DQN(num_states, num_states, num_actions)
         policy_net.build((None, num_states))
-        policy_net.load_weights("frozen_lake_dql_tf.weights.h5")
+        policy_net.load_weights(os.path.join(current_dir, "frozen_lake_dql_tf.weights.h5"))
 
         print("Policy (trained):")
         self.print_policy(policy_net, num_states)
@@ -64,6 +67,8 @@ class FrozenLakeTester:
     def plot_test_results(self, rewards, steps_per_episode):
         episodes = len(rewards)
 
+        current_dir = os.path.dirname(__file__)
+
         plt.figure(figsize=(12, 5))
 
         plt.subplot(1, 2, 1)
@@ -82,9 +87,9 @@ class FrozenLakeTester:
         plt.grid(True, axis='y')
 
         plt.tight_layout()
-        plt.savefig("test_results.png")
+        plt.savefig(os.path.join(current_dir, "test_results.png"))
         plt.show()
 
 if __name__ == "__main__":
     tester = FrozenLakeTester()
-    tester.test(episodes=100, is_slippery=True)
+    tester.test(episodes=100, is_slippery=False)

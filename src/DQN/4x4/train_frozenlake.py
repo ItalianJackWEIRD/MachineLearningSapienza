@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import random
+import os
 from collections import deque
 from dqn_model import DQN  # Assumes DQN is defined in dqn_model.py
 
@@ -30,7 +31,7 @@ class FrozenLakeTrainer:
         self.loss_fn = tf.keras.losses.MeanSquaredError()
         self.actions = ['L', 'D', 'R', 'U']
 
-    def train(self, episodes=1000, is_slippery=False):
+    def train(self, episodes=10000, is_slippery=False):
         env = gym.make('FrozenLake-v1', map_name='4x4', is_slippery=is_slippery)
         num_states = env.observation_space.n
         num_actions = env.action_space.n
@@ -85,7 +86,8 @@ class FrozenLakeTrainer:
                     steps = 0
 
         env.close()
-        policy_net.save_weights("frozen_lake_dql_tf.weights.h5")
+        current_dir = os.path.dirname(__file__)
+        policy_net.save_weights(os.path.join(current_dir, "frozen_lake_dql_tf.weights.h5"))
 
         print("\nPolicy (trained, after training):")
         self.print_policy(policy_net, num_states)
@@ -125,6 +127,8 @@ class FrozenLakeTrainer:
         window = 100
         moving_avg = np.convolve(rewards, np.ones(window)/window, mode='valid')
 
+        current_dir = os.path.dirname(__file__)
+
         # Plot 1: Reward per episode
         plt.figure()
         plt.plot(rewards)
@@ -132,7 +136,7 @@ class FrozenLakeTrainer:
         plt.ylabel("Reward")
         plt.title("Reward per Episode")
         plt.grid(True)
-        plt.savefig("reward_per_episode.png")
+        plt.savefig(os.path.join(current_dir, "reward_per_episode.png"))
         plt.close()
 
         # Plot 2: Moving average reward
@@ -142,7 +146,7 @@ class FrozenLakeTrainer:
         plt.ylabel("Avg Reward")
         plt.title(f"{window}-Episode Moving Average Reward")
         plt.grid(True)
-        plt.savefig("moving_average_reward.png")
+        plt.savefig(os.path.join(current_dir, "moving_average_reward.png"))
         plt.close()
 
         # Plot 3: Epsilon decay
@@ -152,7 +156,7 @@ class FrozenLakeTrainer:
         plt.ylabel("Epsilon")
         plt.title("Epsilon Decay")
         plt.grid(True)
-        plt.savefig("epsilon_decay.png")
+        plt.savefig(os.path.join(current_dir, "epsilon_decay.png"))
         plt.close()
 
         # Plot 4: Loss over time
@@ -162,7 +166,7 @@ class FrozenLakeTrainer:
         plt.ylabel("Loss")
         plt.title("Loss Over Time")
         plt.grid(True)
-        plt.savefig("loss_over_time.png")
+        plt.savefig(os.path.join(current_dir, "loss_over_time.png"))
         plt.close()
 
 
@@ -177,4 +181,4 @@ class FrozenLakeTrainer:
 
 if __name__ == "__main__":
     trainer = FrozenLakeTrainer()
-    trainer.train(episodes=10000, is_slippery=True)
+    trainer.train(episodes=10000, is_slippery=False)
