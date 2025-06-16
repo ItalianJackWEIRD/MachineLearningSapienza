@@ -3,7 +3,7 @@ CONFIG = {
     'map_name': '4x4',
     'is_slippery': False,
     
-    'episodes': 5000,
+    'episodes': 100,
     'learning_rate': 0.001,
     'memory_size': 5000,
     'mini_batch_size': 64,

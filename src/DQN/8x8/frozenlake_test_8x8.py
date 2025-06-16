@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from frozenlake_dqn_model_8x8 import DQN
 import tensorflow as tf
+import os
 from config8x8 import CONFIG
 
 ACTIONS = ['L', 'D', 'R', 'U']
@@ -13,14 +14,18 @@ def state_to_input(state, num_states):
     return np.expand_dims(one_hot, axis=0)
 
 def test(episodes=10):
-    env = gym.make(CONFIG['env_name'], map_name=CONFIG['map_name'], is_slippery=CONFIG['is_slippery'], render_mode='human')
+    env = gym.make(CONFIG['env_name'], map_name=CONFIG['map_name'], is_slippery=CONFIG['is_slippery'])
     num_states = env.observation_space.n
     num_actions = env.action_space.n
 
     # Use hidden layers list from config
     hidden_layers = CONFIG.get('hidden_layer_sizes', [128, 64])
     dqn = DQN(num_states, *hidden_layers, num_actions)
-    dqn.load_weights("frozen_lake_dql_8x8.weights.h5")
+    dqn.build(input_shape=(None, num_states))
+    # Load the trained weights
+    current_dir = os.path.dirname(__file__)
+    weights_path = os.path.join(current_dir, "frozen_lake_dql_8x8.weights.h5")
+    dqn.load_weights(weights_path)
 
     rewards = []
     steps = []
@@ -46,6 +51,8 @@ def test(episodes=10):
 
     env.close()
 
+    current_dir = os.path.dirname(__file__)
+
     plt.figure(figsize=(12, 5))
 
     plt.subplot(1, 2, 1)
@@ -63,7 +70,7 @@ def test(episodes=10):
     plt.grid(True)
 
     plt.tight_layout()
-    plt.savefig("frozen_lake_test_results_8x8.png")
+    plt.savefig(os.path.join(current_dir,"frozen_lake_test_results_8x8.png"))
     plt.show()
 
     print(f"\nAverage reward over {episodes} episodes: {np.mean(rewards):.2f}")

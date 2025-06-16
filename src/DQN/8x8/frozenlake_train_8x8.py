@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from frozenlake_dqn_model_8x8 import DQN, ReplayMemory
 import tensorflow as tf
 import random
+import os
 from config8x8 import CONFIG
 
 ACTIONS = ['L', 'D', 'R', 'U']  # for printing 0,1,2,3 -> 'Left', 'Down', 'Right', 'Up'
@@ -31,9 +32,11 @@ def train():
     
     # Instantiate DQN with *unpack hidden layers*
     policy_dqn = DQN(num_states, *hidden_layers, num_actions)       # STEP 1 : Create the policy network
-    policy_dqn.build(input_shape=(None, num_states))
 
     target_dqn = DQN(num_states, *hidden_layers, num_actions)       # STEP 2 : Create the target network identical to the policy network
+    dummy_input = tf.random.uniform((1, num_states))        # Create a dummy input to build the model
+    policy_dqn(dummy_input)
+    target_dqn(dummy_input)
     target_dqn.set_weights(policy_dqn.get_weights())
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=CONFIG['learning_rate'])     # NN optimizer
@@ -104,7 +107,10 @@ def train():
         if (i+1) % 1000 == 0:
             print(f"Episode {i+1}/{episodes} - Epsilon: {epsilon:.3f} - Recent avg reward: {np.mean(rewards_per_episode[max(0,i-999):i+1]):.3f}")
 
-    policy_dqn.save_weights("frozen_lake_dql_8x8.weights.h5")
+
+    current_dir = os.path.dirname(__file__)
+
+    policy_dqn.save_weights(os.path.join(current_dir, "frozen_lake_dql_8x8.weights.h5"))
 
     plt.figure(figsize=(12, 5))
 
@@ -128,7 +134,7 @@ def train():
     plt.grid(True)
 
     plt.tight_layout()
-    plt.savefig("frozen_lake_dql_8x8.png")
+    plt.savefig(os.path.join(current_dir,"frozen_lake_dql_8x8.png"))
     plt.show()
 
 if __name__ == '__main__':

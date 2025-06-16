@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from frozenlake_dqn_model_4x4 import DQN, ReplayMemory
 import tensorflow as tf
 import random
+import os
 from config4x4 import CONFIG
 
 def state_to_input(state, num_states):
@@ -19,6 +20,8 @@ def train():
     hidden1 = CONFIG['hidden_layer_sizes'][0]
 
     policy_dqn = DQN(num_states, hidden1, num_actions)
+    policy_dqn.build(input_shape=(None, num_states))
+
     target_dqn = DQN(num_states, hidden1, num_actions)
     target_dqn.set_weights(policy_dqn.get_weights())
 
@@ -87,7 +90,10 @@ def train():
             avg_reward = np.mean(rewards_per_episode[max(0,i-499):i+1])
             print(f"Episode {i+1}/{episodes} - Epsilon: {epsilon:.3f} - Recent avg reward: {avg_reward:.3f}")
 
-    policy_dqn.save_weights("frozen_lake_dql_4x4.weights.h5")
+
+    current_dir = os.path.dirname(__file__)
+
+    policy_dqn.save_weights(os.path.join(current_dir, "frozen_lake_dql_4x4.weights.h5"))
 
     plt.figure(figsize=(12, 5))
     window_size = 100
@@ -110,7 +116,7 @@ def train():
     plt.grid(True)
 
     plt.tight_layout()
-    plt.savefig("frozen_lake_dql_4x4.png")
+    plt.savefig(os.path.join(current_dir,"frozen_lake_dql_4x4.png"))
     plt.show()
 
 if __name__ == '__main__':
