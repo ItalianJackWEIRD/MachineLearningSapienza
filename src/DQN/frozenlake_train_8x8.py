@@ -31,6 +31,8 @@ def train():
     
     # Instantiate DQN with *unpack hidden layers*
     policy_dqn = DQN(num_states, *hidden_layers, num_actions)       # STEP 1 : Create the policy network
+    policy_dqn.build(input_shape=(None, num_states))
+
     target_dqn = DQN(num_states, *hidden_layers, num_actions)       # STEP 2 : Create the target network identical to the policy network
     target_dqn.set_weights(policy_dqn.get_weights())
 

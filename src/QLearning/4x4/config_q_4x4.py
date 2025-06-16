@@ -1,7 +1,7 @@
 CONFIG = {
     'env_name': 'FrozenLake-v1',
     'map_name': '4x4',
-    'is_slippery': True,
+    'is_slippery': False,
     'episodes': 10000,
     'alpha': 0.1,
     'gamma': 0.99,

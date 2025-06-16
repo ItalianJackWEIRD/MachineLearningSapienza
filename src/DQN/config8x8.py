@@ -18,6 +18,7 @@ CONFIG = {
     "episodes": 10000
 }
 
+
 # Note: "gamma" is the discount factor, The discount factor determines how much the agent values future rewards compared to immediate rewards.
 # A value of γ = 0 makes the agent short-sighted: it only cares about immediate rewards.
 # A value of γ = 1 makes the agent far-sighted: it cares about long-term rewards just as much as immediate ones.

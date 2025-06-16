@@ -8,6 +8,8 @@ from q_learning import QLearningAgent
 from utils import plot_rewards, plot_smoothed_rewards
 from config_q_4x4 import CONFIG
 
+
+
 env = gym.make(CONFIG['env_name'], map_name=CONFIG['map_name'], is_slippery=CONFIG['is_slippery'])
 agent = QLearningAgent(
     state_size=env.observation_space.n,
